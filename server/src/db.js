@@ -5,18 +5,33 @@ import { fileURLToPath } from 'node:url';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
+// Env values pasted into a host's dashboard often arrive with surrounding
+// quotes or a trailing newline — strip those so a valid URL isn't rejected.
+function cleanEnv(v) {
+  return v == null ? v : v.trim().replace(/^['"]|['"]$/g, '').trim();
+}
+
 // Two modes:
 //  - Hosted (prod): TURSO_DATABASE_URL (+ TURSO_AUTH_TOKEN) → remote libSQL/Turso.
 //  - Local (dev):   a plain SQLite file under DATA_DIR (default server/data).
-const remoteUrl = process.env.TURSO_DATABASE_URL;
+const remoteUrl = cleanEnv(process.env.TURSO_DATABASE_URL);
+const authToken = cleanEnv(process.env.TURSO_AUTH_TOKEN);
 let client;
 if (remoteUrl) {
-  client = createClient({ url: remoteUrl, authToken: process.env.TURSO_AUTH_TOKEN });
+  if (!/^(libsql|https?|wss?):\/\//.test(remoteUrl)) {
+    throw new Error(
+      `TURSO_DATABASE_URL looks malformed (got "${remoteUrl.slice(0, 12)}…", ` +
+        `length ${remoteUrl.length}). It should start with libsql:// — check for stray quotes/spaces.`
+    );
+  }
+  client = createClient({ url: remoteUrl, authToken });
+  console.log(`[db] remote libSQL: ${remoteUrl}`);
 } else {
   const dataDir = process.env.DATA_DIR || join(__dirname, '..', 'data');
   mkdirSync(dataDir, { recursive: true });
   const fileUrl = 'file:' + join(dataDir, 'fitness-freak.db').replace(/\\/g, '/');
   client = createClient({ url: fileUrl });
+  console.log('[db] local SQLite file');
 }
 
 export const isRemote = Boolean(remoteUrl);
