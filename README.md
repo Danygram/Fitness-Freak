@@ -8,10 +8,13 @@ reuse the same backend API later.
 
 ## Tech
 
-- **Backend** — Node + Express, built-in `node:sqlite` database, `node:crypto` for
-  scrypt password hashing and signed auth tokens. No native build step required
-  (needs Node 22+; developed on Node 25).
-- **Frontend** — React + Vite + TypeScript, React Router, Recharts.
+- **Backend** — Node + Express, `@libsql/client` (SQLite via libSQL — a local
+  file in dev, a hosted Turso database in production), `node:crypto` for scrypt
+  password hashing and signed auth tokens. Needs Node 20+.
+- **Frontend** — React + Vite + TypeScript, React Router, Recharts. Installable
+  PWA (offline shell + add-to-home-screen).
+- **Deploy** — one service; Express serves the built client. See
+  [DEPLOY.md](DEPLOY.md).
 
 ## Features
 
