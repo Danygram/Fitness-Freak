@@ -14,16 +14,13 @@ function cleanEnv(v) {
 // Two modes:
 //  - Hosted (prod): TURSO_DATABASE_URL (+ TURSO_AUTH_TOKEN) → remote libSQL/Turso.
 //  - Local (dev):   a plain SQLite file under DATA_DIR (default server/data).
-const remoteUrl = cleanEnv(process.env.TURSO_DATABASE_URL);
+let remoteUrl = cleanEnv(process.env.TURSO_DATABASE_URL);
 const authToken = cleanEnv(process.env.TURSO_AUTH_TOKEN);
 let client;
 if (remoteUrl) {
-  if (!/^(libsql|https?|wss?):\/\//.test(remoteUrl)) {
-    throw new Error(
-      `TURSO_DATABASE_URL looks malformed (got "${remoteUrl.slice(0, 12)}…", ` +
-        `length ${remoteUrl.length}). It should start with libsql:// — check for stray quotes/spaces.`
-    );
-  }
+  // Tolerate a bare host (no scheme) — a common paste mistake from the
+  // Turso dashboard — by defaulting to the libsql:// scheme.
+  if (!/^\w+:\/\//.test(remoteUrl)) remoteUrl = 'libsql://' + remoteUrl;
   client = createClient({ url: remoteUrl, authToken });
   console.log(`[db] remote libSQL: ${remoteUrl}`);
 } else {
