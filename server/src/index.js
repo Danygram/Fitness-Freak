@@ -1,13 +1,7 @@
+import './env.js'; // MUST be first: loads .env before db.js/routes read process.env
 import { fileURLToPath } from 'node:url';
 import { existsSync } from 'node:fs';
 import { join } from 'node:path';
-
-// Load server/.env (OAuth secrets etc.) if present — before anything reads process.env.
-try {
-  process.loadEnvFile(fileURLToPath(new URL('../.env', import.meta.url)));
-} catch {
-  /* no .env file — fine, integrations stay inactive until configured */
-}
 
 import express from 'express';
 import cors from 'cors';
