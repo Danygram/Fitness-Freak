@@ -1,0 +1,32 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/*
+ * shadcn/ui design tokens mapped to Fitness Freak's bespoke lime/dark palette,
+ * so any component pulled from 21st.dev / shadcn automatically wears OUR theme
+ * (lime primary, cooled near-black surfaces) instead of the generic shadcn gray.
+ * The app is dark-only, so these live on :root.
+ */
+:root {
+  --background: 220 24% 5%; /* #090b0f */
+  --foreground: 222 30% 97%; /* #f4f6fa */
+  --card: 221 25% 9%; /* #12161e */
+  --card-foreground: 222 30% 97%;
+  --popover: 220 24% 12%; /* #171c26 */
+  --popover-foreground: 222 30% 97%;
+  --primary: 80 86% 59%; /* lime #b6f23d */
+  --primary-foreground: 90 60% 4%; /* #0b1004 */
+  --secondary: 220 23% 12%;
+  --secondary-foreground: 222 30% 97%;
+  --muted: 220 23% 12%;
+  --muted-foreground: 218 13% 65%; /* #99a3b2 */
+  --accent: 218 23% 15%; /* #1e2430 */
+  --accent-foreground: 222 30% 97%;
+  --destructive: 0 90% 70%; /* #f76d6d */
+  --destructive-foreground: 0 0% 100%;
+  --border: 220 14% 18%;
+  --input: 220 14% 18%;
+  --ring: 80 86% 59%;
+  --radius: 0.75rem;
+}

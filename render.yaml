@@ -1,0 +1,30 @@
+# Render blueprint — one free web service that builds the React client and
+# serves it from the Express API (single origin). The database is remote
+# (Turso/libSQL), so no persistent disk is needed and the free plan works.
+#
+# To deploy: push this repo to GitHub, then on Render pick "New +" →
+# "Blueprint" and point it at the repo. Render reads this file, then asks you
+# to fill the secrets marked `sync: false`.
+services:
+  - type: web
+    name: fitness-freak
+    runtime: node
+    plan: free
+    buildCommand: npm run build
+    startCommand: npm start
+    autoDeploy: true
+    envVars:
+      - key: NODE_VERSION
+        value: "22"
+      # From `turso db show <db> --url` (looks like libsql://<db>-<org>.turso.io)
+      - key: TURSO_DATABASE_URL
+        sync: false
+      # From `turso db tokens create <db>`
+      - key: TURSO_AUTH_TOKEN
+        sync: false
+      # Signs auth tokens — let Render generate a strong random value.
+      - key: JWT_SECRET
+        generateValue: true
+      # Set to this service's own URL after the first deploy (used by OAuth).
+      - key: FRONTEND_URL
+        sync: false
