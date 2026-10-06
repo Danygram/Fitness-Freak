@@ -183,6 +183,19 @@ const PATHS: Record<string, JSX.Element> = {
       <path d="M10.3 20.5a2 2 0 0 0 3.4 0" />
     </>
   ),
+  user: (
+    <>
+      <circle cx="12" cy="8" r="3.75" />
+      <path d="M4.5 20c0-4 3.4-6.3 7.5-6.3S19.5 16 19.5 20" />
+    </>
+  ),
+  more: (
+    <>
+      <circle cx="5" cy="12" r="1.5" fill="currentColor" stroke="none" />
+      <circle cx="12" cy="12" r="1.5" fill="currentColor" stroke="none" />
+      <circle cx="19" cy="12" r="1.5" fill="currentColor" stroke="none" />
+    </>
+  ),
 };
 
 export type IconName = keyof typeof PATHS;

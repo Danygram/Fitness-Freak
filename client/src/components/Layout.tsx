@@ -1,11 +1,14 @@
-import { useEffect } from 'react';
-import { NavLink, Outlet } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { NavLink, Outlet, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { Icon, type IconName } from './icons';
 import { runReminderTick } from '../lib/reminders';
 import { todayISO } from '../api';
 
-const NAV: { to: string; label: string; icon: IconName; end?: boolean }[] = [
+type NavItem = { to: string; label: string; icon: IconName; end?: boolean };
+
+// Full menu — shown in the desktop sidebar.
+const NAV: NavItem[] = [
   { to: '/', label: 'Dashboard', icon: 'dashboard', end: true },
   { to: '/nutrition', label: 'Nutrition', icon: 'nutrition' },
   { to: '/weight', label: 'Weight', icon: 'weight' },
@@ -14,6 +17,23 @@ const NAV: { to: string; label: string; icon: IconName; end?: boolean }[] = [
   { to: '/activity', label: 'Activity', icon: 'activity' },
   { to: '/devices', label: 'Devices', icon: 'watch' },
   { to: '/goals', label: 'Goals', icon: 'target' },
+];
+
+// Mobile bottom bar — just the core four; everything else lives under "More".
+const PRIMARY: NavItem[] = [
+  { to: '/', label: 'Dashboard', icon: 'dashboard', end: true },
+  { to: '/nutrition', label: 'Nutrition', icon: 'nutrition' },
+  { to: '/weight', label: 'Weight', icon: 'weight' },
+  { to: '/activity', label: 'Activity', icon: 'activity' },
+];
+
+const MORE: NavItem[] = [
+  { to: '/insights', label: 'Insights', icon: 'chart' },
+  { to: '/workouts', label: 'Workouts', icon: 'dumbbell' },
+  { to: '/devices', label: 'Devices', icon: 'watch' },
+  { to: '/goals', label: 'Goals', icon: 'target' },
+  { to: '/settings', label: 'Settings', icon: 'settings' },
+  { to: '/account', label: 'Account', icon: 'user' },
 ];
 
 function Brand() {
@@ -29,6 +49,13 @@ function Brand() {
 
 export default function Layout() {
   const { user, logout } = useAuth();
+  const location = useLocation();
+  const [moreOpen, setMoreOpen] = useState(false);
+
+  // Close the "More" sheet whenever the route changes.
+  useEffect(() => {
+    setMoreOpen(false);
+  }, [location.pathname]);
 
   // Fire due reminders while the app is open (checked every minute).
   useEffect(() => {
@@ -66,6 +93,11 @@ export default function Layout() {
         .join('')
         .toUpperCase()
     : '?';
+
+  // Highlight the "More" tab when the active route lives inside the sheet.
+  const moreActive = MORE.some(
+    (m) => location.pathname === m.to || location.pathname.startsWith(m.to + '/')
+  );
 
   return (
     <div className="app-shell">
@@ -131,8 +163,51 @@ export default function Layout() {
         <Outlet />
       </main>
 
+      {/* Mobile "More" sheet */}
+      {moreOpen && (
+        <div className="more-sheet-backdrop" onClick={() => setMoreOpen(false)}>
+          <div
+            className="more-sheet"
+            role="dialog"
+            aria-label="More"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="more-sheet-handle" />
+            <div className="more-sheet-head">
+              <NavLink to="/account" className="more-user">
+                <div className="avatar">{initials}</div>
+                <div className="meta">
+                  <div className="name">{user?.name}</div>
+                  <div className="email">{user?.email}</div>
+                </div>
+              </NavLink>
+              <button className="btn-icon" onClick={() => setMoreOpen(false)} aria-label="Close">
+                <Icon name="x" />
+              </button>
+            </div>
+            <div className="more-grid">
+              {MORE.map((item) => (
+                <NavLink
+                  key={item.to}
+                  to={item.to}
+                  className={({ isActive }) => `more-tile${isActive ? ' active' : ''}`}
+                >
+                  <span className="nav-icon">
+                    <Icon name={item.icon} />
+                  </span>
+                  {item.label}
+                </NavLink>
+              ))}
+            </div>
+            <button className="more-logout" onClick={logout}>
+              <Icon name="power" size={16} /> Log out
+            </button>
+          </div>
+        </div>
+      )}
+
       <nav className="bottom-nav">
-        {NAV.map((item) => (
+        {PRIMARY.map((item) => (
           <NavLink
             key={item.to}
             to={item.to}
@@ -145,6 +220,17 @@ export default function Layout() {
             {item.label}
           </NavLink>
         ))}
+        <button
+          type="button"
+          className={`nav-link more-btn${moreActive || moreOpen ? ' active' : ''}`}
+          onClick={() => setMoreOpen((v) => !v)}
+          aria-expanded={moreOpen}
+        >
+          <span className="nav-icon">
+            <Icon name="more" />
+          </span>
+          More
+        </button>
       </nav>
     </div>
   );
