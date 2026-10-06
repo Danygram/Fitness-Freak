@@ -2,12 +2,18 @@
   "name": "fitness-freak",
   "private": true,
   "version": "1.0.0",
-  "description": "Fitness Freak — full-stack health & fitness tracker (single-service deploy).",
+  "description": "Fitness Freak — full-stack health & fitness tracker.",
+  "type": "module",
   "engines": {
     "node": ">=20"
   },
   "scripts": {
     "build": "npm --prefix client install && npm --prefix client run build && npm --prefix server install",
     "start": "node server/src/index.js"
+  },
+  "dependencies": {
+    "@libsql/client": "^0.18.0",
+    "cors": "^2.8.5",
+    "express": "^4.21.2"
   }
 }
