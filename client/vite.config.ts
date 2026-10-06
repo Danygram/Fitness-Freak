@@ -12,6 +12,19 @@ export default defineConfig({
       '@': path.resolve(root, 'src'),
     },
   },
+  build: {
+    rollupOptions: {
+      output: {
+        // Split big, rarely-changing libraries into their own chunks so they
+        // cache independently and don't bloat the main app chunk.
+        manualChunks: {
+          react: ['react', 'react-dom', 'react-router-dom'],
+          charts: ['recharts'],
+          motion: ['motion'],
+        },
+      },
+    },
+  },
   server: {
     port: 5173,
     proxy: {
